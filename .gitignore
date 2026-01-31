@@ -1,0 +1,46 @@
+# Build files
+build/
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.log
+*.a
+*.lib
+*.pch
+*.pdb
+*.ilk
+*.idb
+*.class
+*.pyc
+*.pyo
+*.out
+*.lo
+*.la
+*.loT
+*.gch
+*.slo
+*.mod
+*.cmd
+*.ko
+*.mod.c
+*.tmp
+*.swp
+*.swo
+*.DS_Store
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+Testing/
+
+# IDE specific files
+*.idea/
+*.vscode/
+*.code-workspace
