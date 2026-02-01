@@ -28,8 +28,41 @@ public:
     template<class F, class... Args>
     auto enqueue(F&& f, Args&&... args) 
         -> std::future<typename std::invoke_result<F, Args...>::type>;
+
+    // get the number of threads in the pool
+    size_t getThreadCount() const;
     
-    // Exercise 1: Status query method
+    // get the number of active threads
+    size_t getActiveThreadCount() const;
+
+    // get the number of tasks to be processed in the queue
+    size_t getTaskCount();
+
+    // get the number of waiting threads
+    size_t getWaitingThreadCount() const;
+
+    // get the number of completed tasks
+    size_t getCompletedTaskCount() const;
+
+    // get the number of failed tasks
+    size_t getFailedTaskCount() const;
+
+    // Dynamically resize the thread pool
+    void resize(size_t threads);
+
+    // Pause the thread pool
+    void pause();
+
+    // Resume the thread pool
+    void resume();
+
+    // Wait for all tasks to complete
+    void waitForCompletion();
+
+    // Clear the task queue
+    void clearTasks();
+        
+    // Status query method
     bool isStopped() const { return stop; }
     
 private:
@@ -48,6 +81,12 @@ private:
     
     // Control for stopping the thread pool
     std::atomic<bool> stop{false};
+
+    // Count of active threads
+    std::atomic<size_t> active_threads{0};
+    // Count of completed tasks
+    std::atomic<size_t> completed_tasks{0};
+    std::atomic<size_t> failed_tasks{0};
 };
 
 // Template function implementation

@@ -31,7 +31,41 @@ ThreadPool::~ThreadPool() {
         }
     }
     
-    std::cout << "Thread pool has been closed" << std::endl;
+    std::cout << "Thread pool has been closed"  << std::endl;
+}
+
+// get the number of threads in the pool
+size_t ThreadPool::getThreadCount() const{
+    return workers.size();
+}
+    
+// get the number of active threads
+size_t ThreadPool::getActiveThreadCount() const {
+    return active_threads;
+}
+
+// get the number of tasks to be processed in the queue
+size_t ThreadPool::getTaskCount() {
+    std::unique_lock<std::mutex> lock(queue_mutex);
+    return tasks.size();
+}
+
+// get the number of waiting threads
+size_t ThreadPool::getWaitingThreadCount() const {
+    size_t totalThreads = getThreadCount();
+    size_t activeCount = getActiveThreadCount();
+    // waiting threads = total threads - active threads
+    return totalThreads - activeCount;
+}
+
+// get the number of completed tasks
+size_t ThreadPool::getCompletedTaskCount() const {
+    return completed_tasks;
+}
+
+// Get the number of failed tasks
+size_t ThreadPool::getFailedTaskCount() const {
+    return failed_tasks; // Assuming failed_tasks is a member variable
 }
 
 // Working thread function - The core logic of the thread pool
@@ -62,19 +96,15 @@ void ThreadPool::workerThread() {
         
         // Execute the task (execute outside the lock to avoid blocking other threads)
          if(task) {
-            task();
+            ++active_threads; // Update active thread count
+            try{
+                task();
+            } catch(...){
+                // Handle exceptions thrown by tasks
+            }
+            // Update active and completed task counts
+            --active_threads;
+            ++completed_tasks;      
         }
     }
 }
-
-
-
-// if(task) {
-        //     try {
-        //         task();
-        //     } catch (const std::exception& e) {
-        //         std::cout << "Task execution exception: " << e.what() << std::endl;
-        //     } catch (...) {
-        //         std::cout << "Task execution unknown exception" << std::endl;
-        //     }
-        // }
