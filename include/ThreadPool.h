@@ -11,6 +11,7 @@
 #include <functional>
 #include <stdexcept>
 #include <atomic>
+#include <unordered_set>
 
 class ThreadPool {
 public:
@@ -67,10 +68,12 @@ public:
     
 private:
     // Worker thread function
-    void workerThread();
+    void workerThread(size_t id); // Set to track unique thread IDs
     
     // Container for worker threads
     std::vector<std::thread> workers;
+
+    std::unordered_set<size_t> threadsToStop;
     
     // Task queue
     std::queue<std::function<void()>> tasks;
@@ -78,9 +81,11 @@ private:
     // Synchronization mechanisms
     std::mutex queue_mutex;
     std::condition_variable condition;
+    std::condition_variable waitCondition;
     
     // Control for stopping the thread pool
     std::atomic<bool> stop{false};
+    std::atomic<bool> paused{false};
 
     // Count of active threads
     std::atomic<size_t> active_threads{0};
